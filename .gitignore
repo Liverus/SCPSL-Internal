@@ -400,3 +400,6 @@ hooks.txt
 damithe.vcxproj.filters
 damithe.vcxproj
 dllmain.txt
+
+.gitattributes
+.gitignore
