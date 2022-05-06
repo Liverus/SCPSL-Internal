@@ -396,3 +396,7 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+hooks.txt
+damithe.vcxproj.filters
+damithe.vcxproj
+dllmain.txt
