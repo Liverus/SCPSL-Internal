@@ -7,7 +7,6 @@ decltype(GetModuleHandle)* GetModuleHandle_Copy;
 decltype(GetProcAddress)* GetProcAddress_Copy;
 decltype(GetAsyncKeyState)* GetAsyncKeyState_Copy;
 
-
 il2cpp_init_t il2cpp_init_og;
 
 void il2cpp_init_hk(const char* name) {
@@ -48,16 +47,16 @@ int main(HMODULE mod)
 
     LOG("Waiting for Window and IL2CPP Init...")
 
-    while (!FindWindowA(0, "SCPSL")) {};
+    while (!(FindWindowA(0, "SCPSL") && Cheat::Initialized)) {};
 
     LOG("Found Window! Menu init...");
 
-    //Menu::Initialize();
+    Menu::Initialize();
 
     while (true) {};
 
     Cheat::Shutdown();
-    //Menu::Shutdown();
+    Menu::Shutdown();
 
 	return 0;
 }

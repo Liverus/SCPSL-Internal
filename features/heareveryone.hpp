@@ -1,12 +1,10 @@
 namespace HearEveryone {
 
 	Memory::Hook* get_roundended_chat;
-	
-	bool Enabled = true;
 
 	typedef bool(*Radio_get_roundEnded_t)(OBJECT* this_);
 	bool Radio_get_roundEnded_hk(OBJECT* this_) {
-		return Enabled;
+		return Config::hear_everyone;
 	};
 
 	void Initialize() {

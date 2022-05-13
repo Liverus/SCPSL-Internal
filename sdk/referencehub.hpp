@@ -2,8 +2,8 @@
 class ReferenceHub : public  OBJECT {
 public:
 
-	static Dictionary* GetAllHubs() {
-		typedef Dictionary* (*ReferenceHub_GetAllHubs_t)();
+	static Dictionary<GameObject*, ReferenceHub*>* GetAllHubs() {
+		typedef Dictionary<GameObject*, ReferenceHub*>* (*ReferenceHub_GetAllHubs_t)();
 		return Function<ReferenceHub_GetAllHubs_t>("Assembly-CSharp", "", "ReferenceHub", "GetAllHubs", 0)();
 	}
 
@@ -51,6 +51,14 @@ public:
 		return Function<ReferenceHub_get_playerId_t>("Assembly-CSharp", "", "ReferenceHub", "get_playerId", 0)(this);
 	}
 
+	PlayerMovementSync* GetMovementSync() {
+		return this->GetValue<PlayerMovementSync*>("playerMovementSync");
+	}
+
+	bool IsAlive() {
+		return this->GetClassManager()->IsAlive();
+	}
+
 	bool IsLocalPlayer() {
 		typedef bool (*ReferenceHub_get_isLocalPlayer_t)(ReferenceHub* this_);
 		return Function<ReferenceHub_get_isLocalPlayer_t>("Assembly-CSharp", "", "ReferenceHub", "get_isLocalPlayer", 0)(this);
@@ -59,26 +67,5 @@ public:
 	bool Ready() {
 		typedef bool (*ReferenceHub_get_Ready_t)(ReferenceHub* this_);
 		return Function<ReferenceHub_get_Ready_t>("Assembly-CSharp", "", "ReferenceHub", "get_Ready", 0)(this);
-	}
-
-	static void Loop(bool(*callback)(ReferenceHub*, GameObject*), bool include_localplayer = false, bool include_dead = false) {
-		auto hubs_dict = GetAllHubs();
-		
-		auto hubs_count = hubs_dict->Count();
-		auto hubs_entries = hubs_dict->Entries();
-
-		for (size_t i = 0; i < hubs_count; i++)
-		{
-			auto entry = hubs_entries->GetValue(i);
-			auto hub = entry->GetValue<ReferenceHub*>("value");
-			auto obj = entry->GetValue<GameObject*>("key");
-
-			if (hub->Ready()) {
-				if (hub->IsLocalPlayer() && !include_localplayer) continue;
-				//if (!hub->IsAlive() && !include_dead) continue;
-
-				callback(hub, obj);
-			}
-		}
 	}
 };

@@ -2,6 +2,7 @@
 
 #include <windows.h>
 #include <iostream>
+#include <vector>
 #include <TlHelp32.h>
 
 #define LOG(msg) std::cout << msg << std::endl;
@@ -12,5 +13,6 @@
 
 using namespace IL2CPP;
 
+#include "config.h"
 #include "cheat.h"
 #include "menu.h"

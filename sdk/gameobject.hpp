@@ -40,6 +40,15 @@ public:
 		return Function<GameObject_AddComponent_t>("UnityEngine.CoreModule", "UnityEngine", "GameObject", "AddComponent", 1)(this, component_obj);
 	}
 
+	Transform* GetTransform() {
+		typedef Transform* (*GameObject_get_transform_t)(GameObject* this_);
+		return Function<GameObject_get_transform_t>("UnityEngine.CoreModule", "UnityEngine", "GameObject", "get_transform", 0)(this);
+	}
+
+	Vector3 GetPosition() {
+		return this->GetTransform()->GetPosition();
+	}
+
 	void SetActive(bool state) {
 		typedef void(*GameObject_SetActive_t)(GameObject* this_, bool state);
 		return Function<GameObject_SetActive_t>("UnityEngine.CoreModule", "UnityEngine", "GameObject", "SetActive", 1)(this, state);

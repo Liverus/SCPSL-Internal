@@ -14,11 +14,11 @@ HANDLE CreateToolhelp32Snapshot_hk(DWORD flags, DWORD processid){
 }
 
 BOOL EnumWindowsHide(HWND hWnd, LPARAM lparam) {
-	return TRUE;
+	return 1;
 }
 
 BOOL EnumWindows_hk(WNDENUMPROC cb, LPARAM param) {
-	return TRUE; // EnumWindows_og(EnumWindowsHide, param);
+	return 1;
 }
 
 UINT GetSystemFirmwareTable_hk(DWORD FirmwareTableProviderSignature, DWORD FirmwareTableID, PVOID pFirmwareTableBuffer, DWORD BufferSize) {

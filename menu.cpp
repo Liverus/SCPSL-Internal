@@ -52,10 +52,17 @@ void Menu::Render() {
 void Menu::Populate() {
 	ImGui::Begin("Damithe");
 
-	ImGui::Text("hello");
+	ImGui::Text("Aimbot");
+	ImGui::Checkbox("Enabled", &Config::aimbot);
+	ImGui::Checkbox("Fov", &Config::aimbot_fov);
+	ImGui::SliderFloat("Value", &Config::aimbot_fov_value, 0, 2000.0f);
 
-	static char text_entry[16] = "1234";
-	ImGui::InputText("very intresting nmbers", text_entry, sizeof(text_entry));
+	ImGui::Text("Speedhack");
+	ImGui::SliderFloat("Multiplier", &Config::speedhack_multiplier, 1, 1.3f);
+
+	ImGui::Text("Misc");
+	ImGui::Checkbox("Hear Everyone", &Config::hear_everyone);
+	ImGui::SliderFloat("Fov", &Config::fov, 60.0f, 180.0f);
 
 	ImGui::Separator();
 
@@ -67,8 +74,15 @@ void Menu::Populate() {
 void Menu::Style() {
 	ImGuiStyle* style = &ImGui::GetStyle();
 
+	// +
+	style->WindowBorderSize = 0;
+	style->WindowRounding = 0;
+
+	ImGuiIO& io = ImGui::GetIO();
+	io.Fonts->AddFontFromFileTTF("C:/Windows/Fonts/ARLRDBD.TTF", 16);
+
 	style->WindowPadding = ImVec2(15, 15);
-	style->WindowRounding = 5.0f;
+	//style->WindowRounding = 5.0f;
 	style->FramePadding = ImVec2(5, 5);
 	style->FrameRounding = 4.0f;
 	style->ItemSpacing = ImVec2(12, 8);
@@ -120,8 +134,6 @@ void Menu::Style() {
 	style->Colors[ImGuiCol_PlotLinesHovered] = ImVec4(0.25f, 1.00f, 0.00f, 1.00f);
 	style->Colors[ImGuiCol_PlotHistogram] = ImVec4(0.40f, 0.39f, 0.38f, 0.63f);
 	style->Colors[ImGuiCol_PlotHistogramHovered] = ImVec4(0.25f, 1.00f, 0.00f, 1.00f);
-	style->Colors[ImGuiCol_TextSelectedBg] = ImVec4(0.25f, 1.00f, 0.00f, 0.43f);
-	//style->Colors[ImGuiCol_ModalWindowDarkening] = ImVec4(1.00f, 0.98f, 0.95f, 0.73f);
 }
 
 bool Menu::Shutdown() {

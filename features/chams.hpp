@@ -84,17 +84,6 @@ namespace Chams {
 		}
 	} 
 
-	bool ApplyChams(ReferenceHub* hub, GameObject* obj) {
-
-		ApplyChams(hub);
-
-		return true;
-	}
-
-	void ApplyChams() {
-		ReferenceHub::Loop(ApplyChams);
-	}
-
 	typedef void(*CharacterClassManager_RefreshPlyModel_t)(ClassManager* this_, OBJECT* class_id);
 	CharacterClassManager_RefreshPlyModel_t CharacterClassManager_RefreshPlyModel;
 
