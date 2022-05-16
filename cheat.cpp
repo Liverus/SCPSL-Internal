@@ -7,9 +7,9 @@ namespace SDK {
 	#include "quaternion.hpp"
 	#include "rect.hpp"
 	#include "dictionary.hpp"
+	#include "transform.hpp"
 	#include "physics.hpp"
 	#include "gui.hpp"
-	#include "transform.hpp"
 	#include "shader.hpp"
 	#include "material.hpp"
 	#include "renderer.hpp"
@@ -30,8 +30,8 @@ using namespace SDK;
 // Features
 namespace Features {
 
-	#include "fov.hpp"
 	#include "aimbot.hpp"
+	#include "fov.hpp"
 	#include "chams.hpp"
 	#include "norecoil.hpp"
 	#include "antitesla.hpp"
@@ -39,6 +39,7 @@ namespace Features {
 	#include "heareveryone.hpp"
 	#include "speedhack.hpp"
 	#include "fog.hpp"
+	#include "noclip.hpp"
 	#include "ambientlight.hpp"
 	#include "silentstep.hpp"
 	#include "fixcolors.hpp"
@@ -46,6 +47,7 @@ namespace Features {
 	void Initialize() {
 		FOV::Initialize();
 		AntiTesla::Initialize();
+		Noclip::Initialize();
 		NoRecoil::Initialize();
 		Chams::Initialize();
 		NoRateLimit::Initialize();
@@ -68,7 +70,19 @@ Camera_Render_t Camera_Render;
 
 void Camera_Render_hk(Camera* this_) {
 	Camera_Render(this_);
-	EventManager::Call("Render", this_);
+	EventManager::Call("OnGUI");
+}
+
+typedef void(*OnGUI_t)(OBJECT* this_);
+OnGUI_t OnGUI;
+
+void OnGUI_hk(OBJECT* this_) {
+
+	std::cout << "alled" << std::endl;
+
+	OnGUI(this_);
+
+	// EventManager::Call("OnGUI");
 }
 
 // Cheat
@@ -83,7 +97,7 @@ bool Cheat::Initialize() {
 
 	auto camera_render = Method("UnityEngine.CoreModule", "UnityEngine", "Camera", "Render", 0)->Hook<Camera_Render_t>(Camera_Render_hk, &Camera_Render);
 
-	LOG("Cheat Loaded!");
+	LOG("Cheeto Loaded!");
 
 	Initialized = true;
 

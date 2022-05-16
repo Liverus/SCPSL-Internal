@@ -5,9 +5,8 @@ public:
 		return Function<ClassManager_get_CurRole_t>("Assembly-CSharp", "", "CharacterClassManager", "get_CurRole", 0)(this);
 	}
 
-	bool SetNoclip(bool status) {
-		typedef bool (*ClassManager_SetNoclip_t)(ClassManager* this_, bool status);
-		return Function<ClassManager_SetNoclip_t>("Assembly-CSharp", "", "CharacterClassManager", "SetNoclip", 1)(this, status);
+	void SetNoclip(bool status) {
+		this->SetValue<bool>("NoclipEnabled", &status);
 	}
 
 	bool IsAnySCP() {
@@ -20,6 +19,9 @@ public:
 		return Function<ClassManager_get_IsAlive_t>("Assembly-CSharp", "", "CharacterClassManager", "get_IsAlive", 0)(this);
 	}
 
+	bool IsSpawnProtected() {
+		return this->GetValue<bool>("SpawnProtected");
+	}
 	//Team GetTeam() {
 	//	auto role = GetRole();
 

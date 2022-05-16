@@ -9,10 +9,8 @@ namespace Speedhack {
 	void GetSpeed_hk(OBJECT* this_, float* speed, bool idk) {
 		GetSpeed(this_, speed, idk);
 
-		auto hub = this_->GetValue<ReferenceHub*>("_hub");
-
-		if (hub->IsLocalPlayer()) {
-			*speed = *speed * Config::speedhack_multiplier;
+		if (Config::speedhack) {
+			*speed = *speed * (1 + 0.3 * Config::speedhack_multiplier);
 		}
 	}
 

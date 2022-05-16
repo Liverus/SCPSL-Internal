@@ -1,0 +1,1 @@
+// GUI::Label(Rect(10, 30, 500, 30), "Damithe");

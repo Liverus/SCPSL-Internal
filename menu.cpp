@@ -53,16 +53,34 @@ void Menu::Populate() {
 	ImGui::Begin("Damithe");
 
 	ImGui::Text("Aimbot");
-	ImGui::Checkbox("Enabled", &Config::aimbot);
-	ImGui::Checkbox("Fov", &Config::aimbot_fov);
-	ImGui::SliderFloat("Value", &Config::aimbot_fov_value, 0, 2000.0f);
+	ImGui::Checkbox("Enabled##Aimbot", &Config::aimbot);
+	ImGui::Checkbox("No Recoil##Aimbot", &Config::aimbot_norecoil);
+	ImGui::Checkbox("Autoshoot##Aimbot", &Config::aimbot_autoshoot);
+	ImGui::Checkbox("Friendly Fire##Aimbot", &Config::aimbot_friendlyfire);
+	ImGui::Checkbox("Fov##Aimbot", &Config::aimbot_fov);
+	ImGui::SliderFloat("Value##Aimbot", &Config::aimbot_fov_value, 0.0f, 1920.0f);
+
+	ImGui::Text("Chams");
+	ImGui::Checkbox("Enabled##Chams", &Config::chams);
+	ImGui::Checkbox("Local##Chams", &Config::chams_local);
+	ImGui::Checkbox("Rainbow##Chams", &Config::chams_rgb);
+	ImGui::SliderFloat("Rainbow Speed##Chams", &Config::chams_rgb_speed, 0.0f, 1.0f);
+	ImGui::SliderFloat("Transparency##Chams", &Config::chams_alpha, 0.0f, 1.0f);
+
+	ImGui::Text("Rendering");
+	ImGui::Checkbox("Fix Colors##Rendering", &Config::fix_colors);
+	ImGui::Checkbox("No Fog##Rendering", &Config::no_fog);
+	ImGui::Checkbox("No AmbientLight##Rendering", &Config::no_ambient_light);
 
 	ImGui::Text("Speedhack");
-	ImGui::SliderFloat("Multiplier", &Config::speedhack_multiplier, 1, 1.3f);
+	ImGui::Checkbox("Enabled##Rendering", &Config::speedhack);
+	ImGui::SliderFloat("Multiplier##Speedhack", &Config::speedhack_multiplier, 0.0f, 1.0f);
 
 	ImGui::Text("Misc");
-	ImGui::Checkbox("Hear Everyone", &Config::hear_everyone);
-	ImGui::SliderFloat("Fov", &Config::fov, 60.0f, 180.0f);
+	ImGui::Checkbox("Anti Tesla##Misc", &Config::anti_tesla);
+	ImGui::Checkbox("Hear Everyone##Misc", &Config::hear_everyone);
+	ImGui::Checkbox("Noclip##Misc", &Config::noclip);
+	ImGui::SliderFloat("Fov##Misc", &Config::fov, 60.0f, 170.0f);
 
 	ImGui::Separator();
 

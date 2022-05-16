@@ -1,15 +1,15 @@
 struct Rect {
 public:
 	Rect() {};
-	Rect(float height_, float width_, float xmin_, float ymin_) {
-		height = height_;
-		width  = width_;
-		xmin_  = xmin_;
-		ymin_  = ymin_;
+	Rect(float m_XMin_, float m_YMin_, float m_Width_, float m_Height_) {
+		m_XMin   = m_XMin_;
+		m_YMin   = m_YMin_;
+		m_Width  = m_Width_;
+		m_Height = m_Height_;
 	}
 
-	float height;
-	float width;
-	float xmin;
-	float ymin;
+	float m_XMin;
+	float m_YMin;
+	float m_Width;
+	float m_Height;
 };

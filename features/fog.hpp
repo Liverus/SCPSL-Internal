@@ -5,7 +5,7 @@ namespace Fog {
 	typedef bool(*RenderSettings_get_Fog_t)(OBJECT* this_);
 
 	bool get_Fog_hk(OBJECT* this_) {
-		return false;
+		return !Config::no_fog;
 	}
 
 	void Initialize() {

@@ -2,15 +2,20 @@
 
 namespace Aimbot {
 
-	Memory::Hook* update;
-
-	Camera* camera;
-
 	struct AimbotTarget {
+		bool found;
 		ReferenceHub* hub;
-		HitboxIdentity hitbox;
+		HitboxIdentity* hitbox;
+		Vector3 pos;
+		int multiplier;
 		float distance;
 	};
+
+	Memory::Hook* update;
+
+	AimbotTarget target { false, 0, 0, Vector3(0, 0, 0), 0, 0 };
+
+	Camera* camera;
 
 	float CalculateDistance(Vector3 pos) {
 		auto screen_pos = camera->ToScreen(pos);
@@ -30,29 +35,24 @@ namespace Aimbot {
 		return dist <= Config::aimbot_fov_value;
 	}
 
-	bool CanSee(Vector3 pos) {
+	bool CanSee(Vector3 pos, ReferenceHub* hub) {
 
-		// static int mask = Field("Assembly-CSharp", "InventorySystem.Items.Firearms.Modules", "StandardHitregBase", "HitregMask")->GetStaticValue<int>();
+		auto origin = camera->GetPosition();
 
-		//auto transform = camera->GetTransform();
+		auto hitclass = Class("UnityEngine.PhysicsModule", "UnityEngine", "RaycastHit");
 
-		//auto origin = transform->GetPosition() + transform->Forward() * 10;
+		RaycastHit hit_info;
+		auto hit = Physics::Linecast(origin, pos, &hit_info, 1208238081, 0);
 
-		//std::cout << origin << " " << pos << std::endl;
-
-		//RaycastHit hit_info;
-		//auto hit = linecast(pos, origin, &hit_info, 0);
-
-		//std::cout << hit << " " << hit_info.m_Distance << " " << hit_info.m_Collider << std::endl;
-
-		return true;
+		return !hit;
 	}
 
-	bool FindTarget(Vector3* target) {
+	void FindTarget() {
 
-		bool first_target = true;
-		float min_distance = 0;
+		target = { false, 0, 0, Vector3(0, 0, 0), 0, 0 };
+
 		auto hubs_dict = ReferenceHub::GetAllHubs();
+		auto localplayer = ReferenceHub::GetLocalHub();
 
 		//auto gen_klass = hubs_dict->GetGeneric({
 		//	IL2CPP::Class("UnityEngine.CoreModule", "UnityEngine", "GameObject"),
@@ -62,8 +62,8 @@ namespace Aimbot {
 		auto entries = hubs_dict->GetEntries();
 		auto entries_count = entries->MaxLength();
 
-		for (size_t i = 0; i < entries_count; i++)
-		{
+		for (size_t i = 0; i < entries_count; i++){
+
 			auto entry = entries->GetValue(i);
 
 			auto game_object = entry.key;
@@ -72,6 +72,7 @@ namespace Aimbot {
 			if (game_object && reference_hub) {
 
 				if (reference_hub->IsLocalPlayer()) continue;
+				if (reference_hub->IsSpawnProtected()) continue;
 				if (!reference_hub->IsAlive()) continue;
 
 				static auto hitboxreg_class = Class("Assembly-CSharp", "", "HitboxIdentity");
@@ -82,72 +83,39 @@ namespace Aimbot {
 				for (size_t j = 0; j < hitbox_count; j++)
 				{
 					auto hitbox = hitbox_array->GetValue(j);
+					auto hitbox_multiplier = hitbox->GetDamageMultiplier();
 
-					if (!reference_hub->GetClassManager()->IsAnySCP() && hitbox->GetDamageMultiplier() != 350) continue;
+					if (!Config::aimbot_friendlyfire && HitboxIdentity::IsFriendlyFire(localplayer, reference_hub)) continue;
 
 					auto hitbox_pos = hitbox->GetMassCenter();
 
+					if (!CanSee(hitbox_pos, reference_hub)) continue;
+
 					float dist = CalculateDistance(hitbox_pos);
 
-					if (!CanSee(hitbox_pos)) continue;
 					if (Config::aimbot_fov && !IsInFOV(dist)) continue;
 
-					if (first_target || (dist < min_distance)) {
-						min_distance = dist;
-						*target = hitbox_pos;
-
-						first_target = false;
+					if (!target.found || (hitbox_multiplier >= target.multiplier && dist < target.distance)) {
+						target = { true, reference_hub, hitbox, hitbox_pos, hitbox_multiplier, dist };
 					}
 				}
 			}
 		}
-	
-		return min_distance != 0;
 	}
 
 	void AimAt(Vector3 pos) {
 
 	}
 
-	void Update(Camera* this_) {
+	void OnGUI() {
 
 		// Aim
-		camera = this_;
+		camera = Camera::Current();
 
-		//Vector3 target;
-		//bool found_target = FindTarget(&target);
+		if (!camera) return;
 
-		//if (found_target) {
-		//	std::cout << "target: " << target << std::endl;
-		//}
-
-		//auto localplayer = ReferenceHub::GetLocalHub();
-		//auto movesync = localplayer->GetMovementSync();
-		//movesync->SetRotation(Vector2(0, 0));
-
-
-		//static int mask = Field("Assembly-CSharp", "InventorySystem.Items.MicroHID", "MicroHIDItem", "_mask")->GetStaticValue<int>();
-		//std::cout << "hid: " << mask << std::endl;
-
-		//if ((GetKeyState(VK_DOWN) & 1)) {
-		//	this_->SetNoclip(true);
-		//	std::cout << "toggled" << std::endl;
-		//}
+		FindTarget();
 	}
-
-	//typedef void(*sendpos_t)(PlayerMovementSync* sync, bool a, bool b);
-	//sendpos_t sendpos;
-	//void sendpos_hk(PlayerMovementSync* sync, bool a, bool b) {
-
-	//	auto fpc = sync->GetValue<OBJECT*>("_fpc");
-	//	auto look = fpc->GetValue<OBJECT*>("_mouseLook");
-
-	//	auto lola = GetKeyState(VK_DOWN);
-	//	typedef void(*lol2_t)(OBJECT* this_, float x, bool a, float y, bool b);
-
-	//	Function<lol2_t>("Assembly-CSharp", "", "MouseLook", "OverrideRotation", 4)(look, 0, true, 0, true);
-	//	sendpos(sync, a, b);
-	//}
 
 	struct ShotMessage {
 	public:
@@ -164,21 +132,25 @@ namespace Aimbot {
 	StandardHitregBase_ClientCalculateHit_t StandardHitregBase_ClientCalculateHit;
 
 	bool StandardHitregBase_ClientCalculateHit_hk(OBJECT* this_, ShotMessage* msg) {
+
 		auto res = StandardHitregBase_ClientCalculateHit(this_, msg);
 
 		if (Config::aimbot) {
+			if (target.found) {
 
-			Vector3 target = Vector3(0, 0, 0);
-			bool found_target = FindTarget(&target);
+				std::cout << target.hitbox->GetDamageMultiplier() << std::endl;
 
-			if (found_target) {
 				auto origin = msg->ShooterPosition;
-				auto delta_angle = origin.DeltaAngle(target);
+				auto delta_angle = origin.DeltaAngle(target.pos);
 
 				msg->ShooterCameraRotation = delta_angle.x;
 				msg->ShooterCharacterRotation = delta_angle.y;
 
 				return true;
+			}
+
+			if (Config::aimbot_autoshoot) {
+				return false;
 			}
 		}
 
@@ -186,7 +158,7 @@ namespace Aimbot {
 	}
 
 	void Initialize() {
-		EventManager::Add("Render", Aimbot::Update);
+		EventManager::Add("OnGUI", Aimbot::OnGUI);
 
 		// Method("Assembly-CSharp", "", "PlayerMovementSync", "SendPosition", 2)->Hook<sendpos_t>(sendpos_hk, &sendpos);
 		Method("Assembly-CSharp", "InventorySystem.Items.Firearms.Modules", "StandardHitregBase", "ClientCalculateHit", 1)->Hook<StandardHitregBase_ClientCalculateHit_t>(StandardHitregBase_ClientCalculateHit_hk, &StandardHitregBase_ClientCalculateHit);

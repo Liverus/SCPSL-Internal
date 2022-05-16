@@ -9,7 +9,11 @@ public:
 		a = a_;
 	}
 
-    static Color Rainbow(float speed=0.001f)
+	friend std::ostream& operator<<(std::ostream& os, const Color& clr) {
+		return os << "Color(" << clr.r << ", " << clr.g << ", " << clr.b << ", " << clr.a << ")";
+	}
+
+    static Color Rainbow(float speed=0.1f)
     {
         static uint32_t cnt = 0;
 

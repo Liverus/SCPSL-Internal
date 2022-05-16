@@ -7,9 +7,24 @@ public:
 struct RaycastHit {
 public:
 
+	Transform* GetTransform() {
+		typedef Transform* (*RaycastHit_get_transform_t)(RaycastHit this_);
+		return Function<RaycastHit_get_transform_t>("UnityEngine.PhysicsModule", "UnityEngine", "RaycastHit", "get_transform", 0)(*this);
+	}
+
 	Vector3 GetPosition() {
 		typedef Vector3(*RaycastHit_get_point_t)(RaycastHit this_);
 		return Function<RaycastHit_get_point_t>("UnityEngine.PhysicsModule", "UnityEngine", "RaycastHit", "get_point", 0)(*this);
+	}
+
+	OBJECT* GetCollider() {
+		typedef OBJECT* (*RaycastHit_get_collider_t)(RaycastHit this_);
+		return Function<RaycastHit_get_collider_t>("UnityEngine.PhysicsModule", "UnityEngine", "RaycastHit", "get_collider", 0)(*this);
+	}
+
+	OBJECT* GetRigidbody() {
+		typedef OBJECT* (*RaycastHit_get_rigidbody_t)(RaycastHit this_);
+		return Function<RaycastHit_get_rigidbody_t>("UnityEngine.PhysicsModule", "UnityEngine", "RaycastHit", "get_rigidbody", 0)(*this);
 	}
 
 	float GetDistance() {
@@ -27,19 +42,14 @@ public:
 
 class Physics : public OBJECT {
 public:
-	static bool Raycast(Ray ray) {
-		typedef bool (*Physics_Raycast_t)(Ray ray);
-		return Function<Physics_Raycast_t>("UnityEngine.PhysicsModule", "UnityEngine", "Physics", "Raycast", 1)(ray);
+	static bool Raycast(Vector3 origin, Vector3 direction, RaycastHit* hit_info, float max_distance, int mask, int trigger=0) {
+		typedef bool (*Physics_Raycast_t)(Vector3 origin, Vector3 direction, RaycastHit* hit_info, float max_distance, int mask, int trigger);
+		return Function<Physics_Raycast_t>("UnityEngine.PhysicsModule", "UnityEngine", "Physics", "Raycast", 6)(origin, direction, hit_info, max_distance, mask, trigger);
 	}
 
-	static bool Raycast(Vector3 origin, Vector3 direction, RaycastHit* hit_info, float max_distance, int mask) {
-		typedef bool (*Physics_Raycast_t)(Vector3 origin, Vector3 direction, RaycastHit* hit_info, float max_distance, int mask);
-		return Function<Physics_Raycast_t>("UnityEngine.PhysicsModule", "UnityEngine", "Physics", "Raycast", 5)(origin, direction, hit_info, max_distance, mask);
-	}
-
-	static bool Linecast(Vector3 start, Vector3 end, RaycastHit* hit_info, int mask) {
-		typedef bool (*Physics_Linecast_t)(Vector3 start, Vector3 end, RaycastHit* hit_info, int mask);
-		return Function<Physics_Linecast_t>("UnityEngine.PhysicsModule", "UnityEngine", "Physics", "Linecast", 4)(start, end, hit_info, mask);
+	static bool Linecast(Vector3 start, Vector3 end, RaycastHit* hit_info, int mask, int trigger=0) {
+		typedef bool (*Physics_Linecast_t)(Vector3 start, Vector3 end, RaycastHit* hit_info, int mask, int trigger);
+		return Function<Physics_Linecast_t>("UnityEngine.PhysicsModule", "UnityEngine", "Physics", "Linecast", 5)(start, end, hit_info, mask, trigger);
 	}
 };
 

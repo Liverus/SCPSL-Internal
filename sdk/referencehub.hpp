@@ -59,6 +59,10 @@ public:
 		return this->GetClassManager()->IsAlive();
 	}
 
+	bool IsSpawnProtected() {
+		return this->GetClassManager()->IsSpawnProtected();
+	}
+
 	bool IsLocalPlayer() {
 		typedef bool (*ReferenceHub_get_isLocalPlayer_t)(ReferenceHub* this_);
 		return Function<ReferenceHub_get_isLocalPlayer_t>("Assembly-CSharp", "", "ReferenceHub", "get_isLocalPlayer", 0)(this);

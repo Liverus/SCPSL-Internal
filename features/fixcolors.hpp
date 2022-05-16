@@ -6,7 +6,7 @@ namespace FixColors {
 	typedef bool(*ColorGrading_IsSupported_t)(OBJECT* this_, OBJECT* a);
 
 	bool IsSupported_hk(OBJECT* this_, OBJECT* a) {
-		return false;
+		return !Config::fix_colors;
 	}
 
 	void Initialize() {
