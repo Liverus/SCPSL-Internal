@@ -1,5 +1,5 @@
 
-class Material : public OBJECT {
+class Material : public Object {
 public:
 
 	//static Material* New(Shader* shader) {
@@ -10,23 +10,23 @@ public:
 	//}
 
 	void SetInt(const char* name, int value) {
-		auto name_str = String(name);
+		auto name_str = String::NewLen(name);
 
-		typedef void(*Material_SetInt_t)(Material* this_, STRING* name, int value);
+		typedef void(*Material_SetInt_t)(Material* this_, String* name, int value);
 		return Function<Material_SetInt_t>("UnityEngine.CoreModule", "UnityEngine", "Material", "SetInt", 2)(this, name_str, value);
 	}
 
 	void SetFloat(const char* name, float value) {
-		auto name_str = String(name);
+		auto name_str = String::NewLen(name);
 
-		typedef void(*Material_SetFloat_t)(Material* this_, STRING* name, float value);
+		typedef void(*Material_SetFloat_t)(Material* this_, String* name, float value);
 		return Function<Material_SetFloat_t>("UnityEngine.CoreModule", "UnityEngine", "Material", "SetFloat", 2)(this, name_str, value);
 	}
 
 	void SetColor(const char* name, Color clr) {
-		auto name_str = String(name);
+		auto name_str = String::NewLen(name);
 
-		typedef void(*Material_SetColor_t)(Material* this_, STRING* name, Color clr);
+		typedef void(*Material_SetColor_t)(Material* this_, String* name, Color clr);
 		return Function<Material_SetColor_t>("UnityEngine.CoreModule", "UnityEngine", "Material", "SetColor", 2)(this, name_str, clr);
 	}
 

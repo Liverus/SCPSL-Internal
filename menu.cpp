@@ -31,8 +31,8 @@ void Cursor_set_visible_hk(bool state) {
 bool Menu::Initialize() {
 	D3D11_Hook::Initialize();
 	
-	 Method("UnityEngine.CoreModule", "UnityEngine", "Cursor", "set_lockState", 1)->Hook<Cursor_set_lockState_t>(Cursor_set_lockState_hk, &Cursor_set_lockState);
-	 Method("UnityEngine.CoreModule", "UnityEngine", "Cursor", "set_visible", 1)->Hook<Cursor_set_visible_t>(Cursor_set_visible_hk, &Cursor_set_visible);
+	Method::Resolve("UnityEngine.CoreModule", "UnityEngine", "Cursor", "set_lockState", 1)->Hook<Cursor_set_lockState_t>(Cursor_set_lockState_hk, &Cursor_set_lockState);
+	Method::Resolve("UnityEngine.CoreModule", "UnityEngine", "Cursor", "set_visible", 1)->Hook<Cursor_set_visible_t>(Cursor_set_visible_hk, &Cursor_set_visible);
 
 	return true;
 }
@@ -50,7 +50,7 @@ void Menu::Render() {
 }
 
 void Menu::Populate() {
-	ImGui::Begin("Damithe");
+	ImGui::Begin("Experience Enhancer");
 
 	ImGui::Text("Aimbot");
 	ImGui::Checkbox("Enabled##Aimbot", &Config::aimbot);

@@ -4,14 +4,14 @@ namespace Config {
 	// Aimbot
 	bool aimbot = true;
 	bool aimbot_norecoil = true;
-	bool aimbot_autoshoot = true;
-	bool aimbot_fov = false;
+	bool aimbot_autoshoot = false;
+	bool aimbot_fov = true;
 	bool aimbot_friendlyfire = false;
-	float aimbot_fov_value = 1920.0f;
+	float aimbot_fov_value = 100.0f;
 
 	// Chams
 	bool chams = true;
-	bool chams_local = false;
+	bool chams_local = true;
 	bool chams_rgb = false;
 	float chams_rgb_speed = 0.1f;
 	float chams_alpha = 0.4f;
@@ -22,7 +22,7 @@ namespace Config {
 	bool no_ambient_light = true;
 
 	// Speedhack
-	bool speedhack = true;
+	bool speedhack = false;
 	float speedhack_multiplier = 0.25f;
 
 	// FOV

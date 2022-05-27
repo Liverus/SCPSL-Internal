@@ -1,4 +1,4 @@
-class HitboxIdentity : public OBJECT {
+class HitboxIdentity : public Object {
 public:
 	Vector3 GetMassCenter() {
 		typedef Vector3 (*HitboxIdentity_get_CenterOfMass_t)(HitboxIdentity* this_);

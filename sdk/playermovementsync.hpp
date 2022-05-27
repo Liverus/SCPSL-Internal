@@ -14,7 +14,7 @@ public:
 	unsigned short y;
 };
 
-class PlayerMovementSync : public OBJECT {
+class PlayerMovementSync : public Object {
 public:
 
 	void SetRotation(Vector2 rot) {

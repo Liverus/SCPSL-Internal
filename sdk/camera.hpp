@@ -1,4 +1,4 @@
-class Camera : public OBJECT {
+class Camera : public Object {
 public:
 
 	static Camera* Main() {

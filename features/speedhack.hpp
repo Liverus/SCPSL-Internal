@@ -3,10 +3,10 @@ namespace Speedhack {
 
 	Memory::Hook* get_speed;
 
-	typedef void (*GetSpeed_t)(OBJECT* this_, float* out, bool idk);
+	typedef void (*GetSpeed_t)(Object* this_, float* out, bool idk);
 	GetSpeed_t GetSpeed;
 
-	void GetSpeed_hk(OBJECT* this_, float* speed, bool idk) {
+	void GetSpeed_hk(Object* this_, float* speed, bool idk) {
 		GetSpeed(this_, speed, idk);
 
 		if (Config::speedhack) {
@@ -15,7 +15,7 @@ namespace Speedhack {
 	}
 
 	void Initialize() {
-		get_speed = Method("Assembly-CSharp", "", "FirstPersonController", "GetSpeed", 2)->Hook<GetSpeed_t>(GetSpeed_hk, &GetSpeed);
+		get_speed = Method::Resolve("Assembly-CSharp", "", "FirstPersonController", "GetSpeed", 2)->Hook<GetSpeed_t>(GetSpeed_hk, &GetSpeed);
 	}
 
 	void Enable() {

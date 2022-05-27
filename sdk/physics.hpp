@@ -17,13 +17,13 @@ public:
 		return Function<RaycastHit_get_point_t>("UnityEngine.PhysicsModule", "UnityEngine", "RaycastHit", "get_point", 0)(*this);
 	}
 
-	OBJECT* GetCollider() {
-		typedef OBJECT* (*RaycastHit_get_collider_t)(RaycastHit this_);
+	Object* GetCollider() {
+		typedef Object* (*RaycastHit_get_collider_t)(RaycastHit this_);
 		return Function<RaycastHit_get_collider_t>("UnityEngine.PhysicsModule", "UnityEngine", "RaycastHit", "get_collider", 0)(*this);
 	}
 
-	OBJECT* GetRigidbody() {
-		typedef OBJECT* (*RaycastHit_get_rigidbody_t)(RaycastHit this_);
+	Object* GetRigidbody() {
+		typedef Object* (*RaycastHit_get_rigidbody_t)(RaycastHit this_);
 		return Function<RaycastHit_get_rigidbody_t>("UnityEngine.PhysicsModule", "UnityEngine", "RaycastHit", "get_rigidbody", 0)(*this);
 	}
 
@@ -40,7 +40,7 @@ public:
 	int m_Collider;
 };
 
-class Physics : public OBJECT {
+class Physics : public Object {
 public:
 	static bool Raycast(Vector3 origin, Vector3 direction, RaycastHit* hit_info, float max_distance, int mask, int trigger=0) {
 		typedef bool (*Physics_Raycast_t)(Vector3 origin, Vector3 direction, RaycastHit* hit_info, float max_distance, int mask, int trigger);
@@ -53,7 +53,7 @@ public:
 	}
 };
 
-class Debug : public OBJECT {
+class Debug : public Object {
 public:
 	static void DrawRay(Vector3 start, Vector3 dir, Color color, float duration) {
 		typedef void (*Debug_DrawRay_t)(Vector3 start, Vector3 dir, Color color, float duration);

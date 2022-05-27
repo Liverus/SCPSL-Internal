@@ -1,12 +1,12 @@
-class ClassManager : public OBJECT {
+class ClassManager : public Object {
 public:
-	OBJECT* GetRole() {
-		typedef OBJECT* (*ClassManager_get_CurRole_t)(ClassManager* this_);
+	Object* GetRole() {
+		typedef Object* (*ClassManager_get_CurRole_t)(ClassManager* this_);
 		return Function<ClassManager_get_CurRole_t>("Assembly-CSharp", "", "CharacterClassManager", "get_CurRole", 0)(this);
 	}
 
-	void SetNoclip(bool status) {
-		this->SetValue<bool>("NoclipEnabled", &status);
+	void SetNoclip(bool* status) {
+		this->SetValue<bool>("NoclipEnabled", status);
 	}
 
 	bool IsAnySCP() {

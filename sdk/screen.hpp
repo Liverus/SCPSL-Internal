@@ -1,4 +1,4 @@
-class Screen : public OBJECT {
+class Screen : public Object {
 public:
 
 	static int Width() {

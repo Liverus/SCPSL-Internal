@@ -11,14 +11,15 @@ namespace Noclip {
 
 	void OnGUI() {
 		auto local_player = ReferenceHub::GetLocalHub();
+
+		if (!local_player) return;
 		
 		auto class_manager = local_player->GetClassManager();
-
 		class_manager->SetNoclip(&Config::noclip);
 	}
 
 	void Initialize() {
-		EventManager::Add("OnGUI", Noclip::OnGUI);
+		EventManager::Add("Update", Noclip::OnGUI);
 	}
 
 	void Enable() {}

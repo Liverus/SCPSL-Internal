@@ -1,4 +1,4 @@
-class Transform : public OBJECT {
+class Transform : public Object {
 public:
 
 	void LookAt(Vector3 pos) {

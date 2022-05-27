@@ -1,5 +1,5 @@
 
-class CharacterController : public OBJECT {
+class CharacterController : public Object {
 public:
 
 	void SetSlopeLimit(float limit) {

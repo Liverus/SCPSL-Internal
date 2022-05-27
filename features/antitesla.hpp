@@ -2,10 +2,10 @@ namespace AntiTesla {
 
 	Memory::Hook* player_in_range;
 
-	typedef bool(*TeslaGate_PlayerInHurtRange_t)(OBJECT* this_, OBJECT* ply);
+	typedef bool(*TeslaGate_PlayerInHurtRange_t)(Object* this_, Object* ply);
 	TeslaGate_PlayerInHurtRange_t TeslaGate_PlayerInHurtRange;
 
-	bool TeslaGate_PlayerInHurtRange_hk(OBJECT* this_, OBJECT* ply) {
+	bool TeslaGate_PlayerInHurtRange_hk(Object* this_, Object* ply) {
 		if (Config::anti_tesla) {
 			return false;
 		} else {
@@ -14,7 +14,7 @@ namespace AntiTesla {
 	}
 
 	void Initialize() {
-		player_in_range = Method("Assembly-CSharp", "", "TeslaGate", "PlayerInHurtRange", 1)->Hook<TeslaGate_PlayerInHurtRange_t>(TeslaGate_PlayerInHurtRange_hk, &TeslaGate_PlayerInHurtRange);
+		player_in_range = Method::Resolve("Assembly-CSharp", "", "TeslaGate", "PlayerInHurtRange", 1)->Hook<TeslaGate_PlayerInHurtRange_t>(TeslaGate_PlayerInHurtRange_hk, &TeslaGate_PlayerInHurtRange);
 	}
 
 	void Enable() {

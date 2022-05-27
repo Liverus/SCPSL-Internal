@@ -2,13 +2,13 @@ namespace NoRateLimit {
 
 	Memory::Hook* can_execute;
 
-	typedef bool(*RateLimit_CanExecute_t)(OBJECT* this_, bool count);
-	bool RateLimit_CanExecute_hk(OBJECT* this_, bool count) {
+	typedef bool(*RateLimit_CanExecute_t)(Object* this_, bool count);
+	bool RateLimit_CanExecute_hk(Object* this_, bool count) {
 		return true;
 	}
 
 	void Initialize() {
-		can_execute = Method("Assembly-CSharp", "Security", "RateLimit", "CanExecute", 1)->Hook<RateLimit_CanExecute_t>(RateLimit_CanExecute_hk);
+		can_execute = Method::Resolve("Assembly-CSharp", "Security", "RateLimit", "CanExecute", 1)->Hook<RateLimit_CanExecute_t>(RateLimit_CanExecute_hk);
 	}
 
 	void Enable() {

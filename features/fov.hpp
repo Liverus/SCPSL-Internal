@@ -20,12 +20,14 @@ namespace FOV {
 	void OnGUI() {
 		auto camera = Camera::Main();
 
+		if (!camera) return;
+
 		Camera_set_fieldOfView(camera, Config::fov);
 	}
 
 	void Initialize() {
-		EventManager::Add("OnGUI", FOV::OnGUI);
-		camera_set_fov = Method("UnityEngine.CoreModule", "UnityEngine", "Camera", "set_fieldOfView", 1)->Hook<Camera_set_fieldOfView_t>(Camera_set_fieldOfView_hk, &Camera_set_fieldOfView);
+		EventManager::Add("Update", FOV::OnGUI);
+		camera_set_fov = Method::Resolve("UnityEngine.CoreModule", "UnityEngine", "Camera", "set_fieldOfView", 1)->Hook<Camera_set_fieldOfView_t>(Camera_set_fieldOfView_hk, &Camera_set_fieldOfView);
 		// camera_get_fov = Method("UnityEngine.CoreModule", "UnityEngine", "Camera", "get_fieldOfView", 0)->Hook<Camera_get_fieldOfView_t>(Camera_get_fieldOfView_hk, &Camera_get_fieldOfView);
 	}
 }

@@ -1,1 +1,13 @@
-// GUI::Label(Rect(10, 30, 500, 30), "Damithe");
+namespace Esp {
+
+	void OnGUI() {
+		GUI::Label(Rect(200, 200, 400, 400), "Hello World!");
+	}
+
+	void Initialize() {
+		EventManager::Add("OnGUI", Esp::OnGUI);
+	}
+
+	void Enable() {}
+	void Disable() {}
+}

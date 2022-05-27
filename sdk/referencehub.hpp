@@ -1,5 +1,5 @@
 
-class ReferenceHub : public  OBJECT {
+class ReferenceHub : public  Object {
 public:
 
 	static Dictionary<GameObject*, ReferenceHub*>* GetAllHubs() {
@@ -22,29 +22,17 @@ public:
 		return this->GetValue<ClassManager*>("characterClassManager");
 	}
 
-	OBJECT* GetRole() {
+	Object* GetRole() {
 		auto class_manager = GetClassManager();
 
 		return class_manager->GetRole();
 	}
-
-	//Role GetRoleID() {
-	//	auto role = GetRole();
-
-	//	return role->GetValue<Role>("roleId");
-	//}
 
 	Color GetRoleColor() {
 		auto role = GetRole();
 
 		return role->GetValue<Color>("classColor");
 	}
-
-	//Team GetTeam() {
-	//	auto class_manager = GetClassManager();
-
-	//	return class_manager->GetTeam();
-	//}
 
 	int PlayerID() {
 		typedef int (*ReferenceHub_get_playerId_t)(ReferenceHub* this_);

@@ -10,6 +10,8 @@ void EventManager::Add(const char* name, void* callback) {
 }
 
 void EventManager::Call(const char* name) {
+	if (!events.count(name)) return;
+
 	auto callbacks = events[name];
 
 	for (auto& callback : callbacks) {

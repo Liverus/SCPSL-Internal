@@ -30,6 +30,7 @@ using namespace SDK;
 // Features
 namespace Features {
 
+	#include "esp.hpp"
 	#include "aimbot.hpp"
 	#include "fov.hpp"
 	#include "chams.hpp"
@@ -45,6 +46,7 @@ namespace Features {
 	#include "fixcolors.hpp"
 
 	void Initialize() {
+		Esp::Initialize();
 		FOV::Initialize();
 		AntiTesla::Initialize();
 		Noclip::Initialize();
@@ -65,24 +67,34 @@ using namespace Features;
 
 // Events
 
-typedef void(*Camera_Render_t)(Camera* this_);
-Camera_Render_t Camera_Render;
+typedef void(*GUIConsole_OnGUI_t)(Object* this_);
+GUIConsole_OnGUI_t GUIConsole_OnGUI;
 
-void Camera_Render_hk(Camera* this_) {
-	Camera_Render(this_);
+void GUIConsole_OnGUI_hk(Object* this_) {
+	//GUIConsole_OnGUI(this_);
 	EventManager::Call("OnGUI");
 }
 
-typedef void(*OnGUI_t)(OBJECT* this_);
-OnGUI_t OnGUI;
+typedef void(*RoundStart_Update_t)(Object* this_);
+RoundStart_Update_t RoundStart_Update;
 
-void OnGUI_hk(OBJECT* this_) {
+void RoundStart_Update_hk(Object* this_) {
+	RoundStart_Update(this_);
+	EventManager::Call("Update");
+	std::cout << "update" << std::endl;
+}
 
-	std::cout << "alled" << std::endl;
+typedef void(*RoundStart_Start_t)(Object* this_);
+RoundStart_Start_t RoundStart_Start;
 
-	OnGUI(this_);
+void RoundStart_Start_hk(Object* this_) {
+	RoundStart_Start(this_);
+	EventManager::Call("Start");
 
-	// EventManager::Call("OnGUI");
+	auto game_obj = Object::New<GameObject*>("UnityEngine.CoreModule", "UnityEngine", "GameObject");
+	GameObject::Create(game_obj, "");
+	game_obj->AddComponent<Object*>(Class::Resolve("Mirror.Components", "Mirror", "GUIConsole"));
+	//game_obj->DontDestroyOnLoad();
 }
 
 // Cheat
@@ -95,9 +107,11 @@ bool Cheat::Initialize() {
 
 	Features::Initialize();
 
-	auto camera_render = Method("UnityEngine.CoreModule", "UnityEngine", "Camera", "Render", 0)->Hook<Camera_Render_t>(Camera_Render_hk, &Camera_Render);
+	auto console_ongui = Method::Resolve("Mirror.Components", "Mirror", "GUIConsole", "OnGUI", 0)->Hook<GUIConsole_OnGUI_t>(GUIConsole_OnGUI_hk, &GUIConsole_OnGUI);
+	auto roundstart_start = Method::Resolve("Assembly-CSharp", "GameCore", "RoundStart", "Start", 0)->Hook<RoundStart_Start_t>(RoundStart_Start_hk, &RoundStart_Start);
+	auto roundstart_update = Method::Resolve("Assembly-CSharp", "GameCore", "RoundStart", "Update", 0)->Hook<RoundStart_Update_t>(RoundStart_Update_hk, &RoundStart_Update);
 
-	LOG("Cheeto Loaded!");
+	LOG("Cheat Loaded!");
 
 	Initialized = true;
 

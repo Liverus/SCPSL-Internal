@@ -11,10 +11,18 @@ namespace Aimbot {
 		float distance;
 	};
 
-	Memory::Hook* update;
+	struct ShotMessage {
+	public:
+		unsigned int TargetNetId;
+		Vector3 TargetPosition;
+		Quaternion TargetRotation;
+		unsigned short ShooterWeaponSerial;
+		Vector3 ShooterPosition;
+		float ShooterCharacterRotation;
+		float ShooterCameraRotation;
+	};
 
 	AimbotTarget target { false, 0, 0, Vector3(0, 0, 0), 0, 0 };
-
 	Camera* camera;
 
 	float CalculateDistance(Vector3 pos) {
@@ -39,8 +47,6 @@ namespace Aimbot {
 
 		auto origin = camera->GetPosition();
 
-		auto hitclass = Class("UnityEngine.PhysicsModule", "UnityEngine", "RaycastHit");
-
 		RaycastHit hit_info;
 		auto hit = Physics::Linecast(origin, pos, &hit_info, 1208238081, 0);
 
@@ -54,13 +60,15 @@ namespace Aimbot {
 		auto hubs_dict = ReferenceHub::GetAllHubs();
 		auto localplayer = ReferenceHub::GetLocalHub();
 
+		if (!localplayer || !hubs_dict) return;
+
 		//auto gen_klass = hubs_dict->GetGeneric({
 		//	IL2CPP::Class("UnityEngine.CoreModule", "UnityEngine", "GameObject"),
 		//	IL2CPP::Class("Assembly-CSharp", "", "ReferenceHub")
 		//});
 		
 		auto entries = hubs_dict->GetEntries();
-		auto entries_count = entries->MaxLength();
+		auto entries_count = entries->GetMaxLength();
 
 		for (size_t i = 0; i < entries_count; i++){
 
@@ -72,20 +80,19 @@ namespace Aimbot {
 			if (game_object && reference_hub) {
 
 				if (reference_hub->IsLocalPlayer()) continue;
-				if (reference_hub->IsSpawnProtected()) continue;
 				if (!reference_hub->IsAlive()) continue;
+				if (reference_hub->IsSpawnProtected()) continue;
+				if (!Config::aimbot_friendlyfire && HitboxIdentity::IsFriendlyFire(localplayer, reference_hub)) continue;
 
-				static auto hitboxreg_class = Class("Assembly-CSharp", "", "HitboxIdentity");
+				static auto hitboxreg_class = Class::Resolve("Assembly-CSharp", "", "HitboxIdentity");
 
 				auto hitbox_array = game_object->GetComponents<HitboxIdentity>(hitboxreg_class);
-				auto hitbox_count = hitbox_array->MaxLength();
+				auto hitbox_count = hitbox_array->GetMaxLength();
 
 				for (size_t j = 0; j < hitbox_count; j++)
 				{
 					auto hitbox = hitbox_array->GetValue(j);
 					auto hitbox_multiplier = hitbox->GetDamageMultiplier();
-
-					if (!Config::aimbot_friendlyfire && HitboxIdentity::IsFriendlyFire(localplayer, reference_hub)) continue;
 
 					auto hitbox_pos = hitbox->GetMassCenter();
 
@@ -103,35 +110,10 @@ namespace Aimbot {
 		}
 	}
 
-	void AimAt(Vector3 pos) {
-
-	}
-
-	void OnGUI() {
-
-		// Aim
-		camera = Camera::Current();
-
-		if (!camera) return;
-
-		FindTarget();
-	}
-
-	struct ShotMessage {
-	public:
-		unsigned int TargetNetId;
-		Vector3 TargetPosition;
-		Quaternion TargetRotation;
-		unsigned short ShooterWeaponSerial;
-		Vector3 ShooterPosition;
-		float ShooterCharacterRotation;
-		float ShooterCameraRotation;
-	};
-
-	typedef bool (*StandardHitregBase_ClientCalculateHit_t)(OBJECT* this_, ShotMessage* a);
+	typedef bool (*StandardHitregBase_ClientCalculateHit_t)(Object* this_, ShotMessage* a);
 	StandardHitregBase_ClientCalculateHit_t StandardHitregBase_ClientCalculateHit;
 
-	bool StandardHitregBase_ClientCalculateHit_hk(OBJECT* this_, ShotMessage* msg) {
+	bool StandardHitregBase_ClientCalculateHit_hk(Object* this_, ShotMessage* msg) {
 
 		auto res = StandardHitregBase_ClientCalculateHit(this_, msg);
 
@@ -157,10 +139,17 @@ namespace Aimbot {
 		return res;
 	}
 
+	void OnGUI() {
+		camera = Camera::Current();
+		if (!camera) return;
+
+		FindTarget();
+	}
+
 	void Initialize() {
-		EventManager::Add("OnGUI", Aimbot::OnGUI);
+		EventManager::Add("Update", Aimbot::OnGUI);
 
 		// Method("Assembly-CSharp", "", "PlayerMovementSync", "SendPosition", 2)->Hook<sendpos_t>(sendpos_hk, &sendpos);
-		Method("Assembly-CSharp", "InventorySystem.Items.Firearms.Modules", "StandardHitregBase", "ClientCalculateHit", 1)->Hook<StandardHitregBase_ClientCalculateHit_t>(StandardHitregBase_ClientCalculateHit_hk, &StandardHitregBase_ClientCalculateHit);
+		Method::Resolve("Assembly-CSharp", "InventorySystem.Items.Firearms.Modules", "StandardHitregBase", "ClientCalculateHit", 1)->Hook<StandardHitregBase_ClientCalculateHit_t>(StandardHitregBase_ClientCalculateHit_hk, &StandardHitregBase_ClientCalculateHit);
 	}
 }
