@@ -55,10 +55,16 @@ void Menu::Populate() {
 	ImGui::Text("Aimbot");
 	ImGui::Checkbox("Enabled##Aimbot", &Config::aimbot);
 	ImGui::Checkbox("No Recoil##Aimbot", &Config::aimbot_norecoil);
+	ImGui::Checkbox("Visible Check##Aimbot", &Config::aimbot_visible);
 	ImGui::Checkbox("Autoshoot##Aimbot", &Config::aimbot_autoshoot);
 	ImGui::Checkbox("Friendly Fire##Aimbot", &Config::aimbot_friendlyfire);
 	ImGui::Checkbox("Fov##Aimbot", &Config::aimbot_fov);
 	ImGui::SliderFloat("Value##Aimbot", &Config::aimbot_fov_value, 0.0f, 1920.0f);
+
+	ImGui::Text("Esp");
+	ImGui::Checkbox("Enabled##Esp", &Config::esp);
+	ImGui::Checkbox("Player Names##Esp", &Config::esp_player_names);
+	ImGui::Checkbox("Player List##Esp", &Config::esp_player_list);
 
 	ImGui::Text("Chams");
 	ImGui::Checkbox("Enabled##Chams", &Config::chams);

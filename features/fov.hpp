@@ -1,7 +1,6 @@
 namespace FOV {
 
 	Memory::Hook* camera_set_fov;
-	Memory::Hook* camera_get_fov;
 
 	typedef void(*Camera_set_fieldOfView_t)(Camera* this_, float fov);
 	Camera_set_fieldOfView_t Camera_set_fieldOfView;
@@ -13,21 +12,22 @@ namespace FOV {
 	typedef float (*Camera_get_fieldOfView_t)(Camera* this_);
 	Camera_get_fieldOfView_t Camera_get_fieldOfView;
 
-	//float Camera_get_fieldOfView_hk(Camera* this_) {
-	//	return Config::fov;
-	//}
+	Camera* camera;
 
-	void OnGUI() {
-		auto camera = Camera::Main();
-
+	void Update() {
 		if (!camera) return;
 
 		Camera_set_fieldOfView(camera, Config::fov);
 	}
 
+	void Start() {
+		camera = Camera::Main();
+	}
+
 	void Initialize() {
-		EventManager::Add("Update", FOV::OnGUI);
+		EventManager::Add("Start", FOV::Start);
+		EventManager::Add("Update", FOV::Update);
+
 		camera_set_fov = Method::Resolve("UnityEngine.CoreModule", "UnityEngine", "Camera", "set_fieldOfView", 1)->Hook<Camera_set_fieldOfView_t>(Camera_set_fieldOfView_hk, &Camera_set_fieldOfView);
-		// camera_get_fov = Method("UnityEngine.CoreModule", "UnityEngine", "Camera", "get_fieldOfView", 0)->Hook<Camera_get_fieldOfView_t>(Camera_get_fieldOfView_hk, &Camera_get_fieldOfView);
 	}
 }

@@ -6,10 +6,9 @@ namespace Chams {
 
 	Shader* chams_shader;
 	Shader* standard_shader;
+	Class* renderer_class;
 
 	void ApplyChams(GameObject* model, Shader* shader, Color color) {
-
-		auto renderer_class = Class::Resolve("UnityEngine.CoreModule", "UnityEngine", "Renderer");
 
 		auto renderer_array = model->GetComponents<Renderer>(renderer_class);
 		auto renderer_count = renderer_array->GetMaxLength();
@@ -45,13 +44,11 @@ namespace Chams {
 
 		if (Config::chams) {
 			if (Config::chams_local || !hub->IsLocalPlayer()) {
-				if (Aimbot::target.hub != hub) {
-					if (Config::chams_rgb) {
-						color = rainbow_color;
-					}
-					else {
-						color = hub->GetRoleColor();
-					}
+				if (Config::chams_rgb) {
+					color = rainbow_color;
+				}
+				else {
+					color = hub->GetRoleColor();
 				}
 
 				if (hub->IsSpawnProtected()) {
@@ -75,15 +72,7 @@ namespace Chams {
 		return standard_shader;
 	}
 
-	void OnGUI() {
-
-		if (!chams_shader) {
-			chams_shader = Shader::Find("GUI/Text Shader");
-		}
-
-		if (!standard_shader) {
-			standard_shader = Shader::Find("Standard");
-		}
+	void Update() {
 
 		if (Config::chams_rgb) {
 			rainbow_color = Color::Rainbow(0.01f + Config::chams_rgb_speed * 0.1f);
@@ -104,6 +93,8 @@ namespace Chams {
 
 			if (game_object && reference_hub) {
 
+				if (!reference_hub->IsReady()) continue;
+				if (reference_hub->IsServer()) continue;
 				if (!reference_hub->IsAlive()) continue;
 
 				auto class_manager = reference_hub->GetValue<ClassManager*>("characterClassManager");
@@ -113,13 +104,22 @@ namespace Chams {
 
 				auto shader = GetShader(reference_hub);
 				auto clr = GetColor(reference_hub);
+
 				ApplyChams(game_object, shader, clr);
 			}
 		}
 	}
+
+	void Start() {
+		chams_shader    = Shader::Find("GUI/Text Shader");
+		standard_shader = Shader::Find("Standard");
+
+		renderer_class = Class::Resolve("UnityEngine.CoreModule", "UnityEngine", "Renderer");
+	}
 	
 	void Initialize() {
-		EventManager::Add("Update", Chams::OnGUI);
+		EventManager::Add("Start", Chams::Start);
+		EventManager::Add("Update", Chams::Update);
 		// refresh_ply_model = Method("Assembly-CSharp", "", "CharacterClassManager", "RefreshPlyModel", 1)->Hook<CharacterClassManager_RefreshPlyModel_t>(CharacterClassManager_RefreshPlyModel_hk, &CharacterClassManager_RefreshPlyModel);
 	}
 

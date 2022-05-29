@@ -3,11 +3,17 @@ namespace Config {
 
 	// Aimbot
 	extern bool aimbot;
+	extern bool aimbot_visible;
 	extern bool aimbot_norecoil;
 	extern bool aimbot_autoshoot;
 	extern bool aimbot_fov;
 	extern bool aimbot_friendlyfire;
 	extern float aimbot_fov_value;
+
+	// Esp
+	extern bool esp;
+	extern bool esp_player_list;
+	extern bool esp_player_names;
 
 	// Chams
 	extern bool chams;

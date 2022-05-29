@@ -3,11 +3,17 @@ namespace Config {
 
 	// Aimbot
 	bool aimbot = true;
+	bool aimbot_visible = true;
 	bool aimbot_norecoil = true;
 	bool aimbot_autoshoot = false;
 	bool aimbot_fov = true;
 	bool aimbot_friendlyfire = false;
 	float aimbot_fov_value = 100.0f;
+
+	// Esp
+	extern bool esp = true;
+	extern bool esp_player_list = true;
+	extern bool esp_player_names = true;
 
 	// Chams
 	bool chams = true;

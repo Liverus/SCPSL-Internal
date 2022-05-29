@@ -22,10 +22,20 @@ public:
 		return this->GetValue<ClassManager*>("characterClassManager");
 	}
 
-	Object* GetRole() {
-		auto class_manager = GetClassManager();
+	String* GetNickname() {
+		return this->GetValue<Object*>("nicknameSync")->GetValue<String*>("_myNickSync");
+	}
 
-		return class_manager->GetRole();
+	Object* GetRole() {
+		return this->GetClassManager()->GetRole();
+	}
+
+	String* GetRoleName() {
+		return this->GetRole()->GetValue<String*>("fullName");
+	}
+
+	RoleType GetRoleID() {
+		return this->GetRole()->GetValue<RoleType>("roleId");
 	}
 
 	Color GetRoleColor() {
@@ -47,6 +57,11 @@ public:
 		return this->GetClassManager()->IsAlive();
 	}
 
+	bool IsServer() {
+		typedef bool (*ReferenceHub_get_isDedicatedServer_t)(ReferenceHub* this_);
+		return Function<ReferenceHub_get_isDedicatedServer_t>("Assembly-CSharp", "", "ReferenceHub", "get_isDedicatedServer", 0)(this);
+	}
+
 	bool IsSpawnProtected() {
 		return this->GetClassManager()->IsSpawnProtected();
 	}
@@ -56,7 +71,7 @@ public:
 		return Function<ReferenceHub_get_isLocalPlayer_t>("Assembly-CSharp", "", "ReferenceHub", "get_isLocalPlayer", 0)(this);
 	}
 
-	bool Ready() {
+	bool IsReady() {
 		typedef bool (*ReferenceHub_get_Ready_t)(ReferenceHub* this_);
 		return Function<ReferenceHub_get_Ready_t>("Assembly-CSharp", "", "ReferenceHub", "get_Ready", 0)(this);
 	}

@@ -6,9 +6,6 @@ namespace NoRecoil {
 	CameraShaking_RecoilShake_t CameraShaking_RecoilShake;
 
 	void CameraShaking_RecoilShake_hk(Object* this_, Object* settings, Object* firearm, float multip) {
-
-		std::cout << "recoil" << std::endl;
-
 		if (!Config::aimbot_norecoil) {
 			CameraShaking_RecoilShake(this_, settings, firearm, multip);
 		}

@@ -7,6 +7,7 @@ namespace SDK {
 	#include "quaternion.hpp"
 	#include "rect.hpp"
 	#include "dictionary.hpp"
+	#include "list.hpp"
 	#include "transform.hpp"
 	#include "physics.hpp"
 	#include "gui.hpp"
@@ -30,13 +31,12 @@ using namespace SDK;
 // Features
 namespace Features {
 
-	#include "esp.hpp"
 	#include "aimbot.hpp"
+	#include "esp.hpp"
 	#include "fov.hpp"
 	#include "chams.hpp"
 	#include "norecoil.hpp"
 	#include "antitesla.hpp"
-	#include "noratelimit.hpp"
 	#include "heareveryone.hpp"
 	#include "speedhack.hpp"
 	#include "fog.hpp"
@@ -52,7 +52,6 @@ namespace Features {
 		Noclip::Initialize();
 		NoRecoil::Initialize();
 		Chams::Initialize();
-		NoRateLimit::Initialize();
 		HearEveryone::Initialize();
 		Aimbot::Initialize();
 		Fog::Initialize();
@@ -81,7 +80,6 @@ RoundStart_Update_t RoundStart_Update;
 void RoundStart_Update_hk(Object* this_) {
 	RoundStart_Update(this_);
 	EventManager::Call("Update");
-	std::cout << "update" << std::endl;
 }
 
 typedef void(*RoundStart_Start_t)(Object* this_);
@@ -91,6 +89,7 @@ void RoundStart_Start_hk(Object* this_) {
 	RoundStart_Start(this_);
 	EventManager::Call("Start");
 
+	// Create MonoBehaviour for OnGUI
 	auto game_obj = Object::New<GameObject*>("UnityEngine.CoreModule", "UnityEngine", "GameObject");
 	GameObject::Create(game_obj, "");
 	game_obj->AddComponent<Object*>(Class::Resolve("Mirror.Components", "Mirror", "GUIConsole"));
@@ -109,7 +108,7 @@ bool Cheat::Initialize() {
 
 	auto console_ongui = Method::Resolve("Mirror.Components", "Mirror", "GUIConsole", "OnGUI", 0)->Hook<GUIConsole_OnGUI_t>(GUIConsole_OnGUI_hk, &GUIConsole_OnGUI);
 	auto roundstart_start = Method::Resolve("Assembly-CSharp", "GameCore", "RoundStart", "Start", 0)->Hook<RoundStart_Start_t>(RoundStart_Start_hk, &RoundStart_Start);
-	auto roundstart_update = Method::Resolve("Assembly-CSharp", "GameCore", "RoundStart", "Update", 0)->Hook<RoundStart_Update_t>(RoundStart_Update_hk, &RoundStart_Update);
+	auto roundstart_update = Method::Resolve("Assembly-CSharp", "GameCore", "RoundStart", "FixedUpdate", 0)->Hook<RoundStart_Update_t>(RoundStart_Update_hk, &RoundStart_Update);
 
 	LOG("Cheat Loaded!");
 

@@ -3,12 +3,9 @@
 namespace Aimbot {
 
 	struct AimbotTarget {
-		bool found;
+		float dist;
 		ReferenceHub* hub;
-		HitboxIdentity* hitbox;
 		Vector3 pos;
-		int multiplier;
-		float distance;
 	};
 
 	struct ShotMessage {
@@ -22,8 +19,11 @@ namespace Aimbot {
 		float ShooterCameraRotation;
 	};
 
-	AimbotTarget target { false, 0, 0, Vector3(0, 0, 0), 0, 0 };
+	AimbotTarget target;
 	Camera* camera;
+	Class* hitboxreg_class;
+
+	Memory::Hook* calculate_hit;
 
 	float CalculateDistance(Vector3 pos) {
 		auto screen_pos = camera->ToScreen(pos);
@@ -32,7 +32,7 @@ namespace Aimbot {
 		auto height = Screen::Height();
 
 		auto screen_center = Vector2(width / 2, height / 2);
-		auto screen_delta = screen_pos - screen_center;
+		auto screen_delta = Vector2(screen_pos.x, screen_pos.y) - screen_center;
 
 		auto screen_dist = screen_delta.Length();
 
@@ -43,7 +43,7 @@ namespace Aimbot {
 		return dist <= Config::aimbot_fov_value;
 	}
 
-	bool CanSee(Vector3 pos, ReferenceHub* hub) {
+	bool CanSee(Vector3 pos) {
 
 		auto origin = camera->GetPosition();
 
@@ -53,9 +53,52 @@ namespace Aimbot {
 		return !hit;
 	}
 
+	AimbotTarget FindHitbox(ReferenceHub* reference_hub, GameObject* game_object) {
+
+		AimbotTarget new_target { 0, 0, Vector3(0, 0, 0) };
+
+		if (reference_hub->GetRoleID() == RoleType::Scp049) {
+			auto pos = game_object->GetPosition() + Vector3(0, 1, 0);
+			auto dist = CalculateDistance(pos);
+
+			return {
+				dist,
+				reference_hub,
+				pos
+			};
+		}
+
+		auto hitbox_array = game_object->GetComponents<HitboxIdentity>(hitboxreg_class);
+		auto hitbox_count = hitbox_array->GetMaxLength();
+
+		int actual_multiplier = 0;
+
+		for (size_t j = 0; j < hitbox_count; j++)
+		{
+			auto hitbox = hitbox_array->GetValue(j);
+			auto hitbox_multiplier = hitbox->GetDamageMultiplier();
+
+			auto hitbox_pos = hitbox->GetMassCenter();
+			float dist = CalculateDistance(hitbox_pos);
+
+			if (!new_target.hub || (hitbox_multiplier >= actual_multiplier)) {
+
+				actual_multiplier = hitbox_multiplier;
+
+				new_target = {
+					dist,
+					reference_hub,
+					hitbox_pos
+				};
+			}
+		}
+
+		return new_target;
+	}
+
 	void FindTarget() {
 
-		target = { false, 0, 0, Vector3(0, 0, 0), 0, 0 };
+		target = { 0, 0, Vector3(0, 0, 0) };
 
 		auto hubs_dict = ReferenceHub::GetAllHubs();
 		auto localplayer = ReferenceHub::GetLocalHub();
@@ -79,32 +122,20 @@ namespace Aimbot {
 
 			if (game_object && reference_hub) {
 
+				if (!reference_hub->IsReady()) continue;
+				if (reference_hub->IsServer()) continue;
 				if (reference_hub->IsLocalPlayer()) continue;
 				if (!reference_hub->IsAlive()) continue;
 				if (reference_hub->IsSpawnProtected()) continue;
 				if (!Config::aimbot_friendlyfire && HitboxIdentity::IsFriendlyFire(localplayer, reference_hub)) continue;
 
-				static auto hitboxreg_class = Class::Resolve("Assembly-CSharp", "", "HitboxIdentity");
+				auto new_target = FindHitbox(reference_hub, game_object);
 
-				auto hitbox_array = game_object->GetComponents<HitboxIdentity>(hitboxreg_class);
-				auto hitbox_count = hitbox_array->GetMaxLength();
+				if (Config::aimbot_fov && !IsInFOV(new_target.dist)) continue;
+				if (Config::aimbot_visible && !CanSee(new_target.pos)) continue;
 
-				for (size_t j = 0; j < hitbox_count; j++)
-				{
-					auto hitbox = hitbox_array->GetValue(j);
-					auto hitbox_multiplier = hitbox->GetDamageMultiplier();
-
-					auto hitbox_pos = hitbox->GetMassCenter();
-
-					if (!CanSee(hitbox_pos, reference_hub)) continue;
-
-					float dist = CalculateDistance(hitbox_pos);
-
-					if (Config::aimbot_fov && !IsInFOV(dist)) continue;
-
-					if (!target.found || (hitbox_multiplier >= target.multiplier && dist < target.distance)) {
-						target = { true, reference_hub, hitbox, hitbox_pos, hitbox_multiplier, dist };
-					}
+				if (!target.hub || new_target.dist < target.dist) {
+					target = new_target;
 				}
 			}
 		}
@@ -118,9 +149,7 @@ namespace Aimbot {
 		auto res = StandardHitregBase_ClientCalculateHit(this_, msg);
 
 		if (Config::aimbot) {
-			if (target.found) {
-
-				std::cout << target.hitbox->GetDamageMultiplier() << std::endl;
+			if (target.hub) {
 
 				auto origin = msg->ShooterPosition;
 				auto delta_angle = origin.DeltaAngle(target.pos);
@@ -139,17 +168,32 @@ namespace Aimbot {
 		return res;
 	}
 
-	void OnGUI() {
-		camera = Camera::Current();
+	void Update() {
+		if (!Config::aimbot) return;
 		if (!camera) return;
 
 		FindTarget();
 	}
 
-	void Initialize() {
-		EventManager::Add("Update", Aimbot::OnGUI);
+	void Start() {
+		target = {false, nullptr, Vector3(0, 0, 0)};
 
-		// Method("Assembly-CSharp", "", "PlayerMovementSync", "SendPosition", 2)->Hook<sendpos_t>(sendpos_hk, &sendpos);
-		Method::Resolve("Assembly-CSharp", "InventorySystem.Items.Firearms.Modules", "StandardHitregBase", "ClientCalculateHit", 1)->Hook<StandardHitregBase_ClientCalculateHit_t>(StandardHitregBase_ClientCalculateHit_hk, &StandardHitregBase_ClientCalculateHit);
+		camera = Camera::Main();
+		hitboxreg_class = Class::Resolve("Assembly-CSharp", "", "HitboxIdentity");
 	}
+
+	void Initialize() {
+		EventManager::Add("Update", Aimbot::Update);
+		EventManager::Add("Start", Aimbot::Start);
+
+		calculate_hit = Method::Resolve("Assembly-CSharp", "InventorySystem.Items.Firearms.Modules", "StandardHitregBase", "ClientCalculateHit", 1)->Hook<StandardHitregBase_ClientCalculateHit_t>(StandardHitregBase_ClientCalculateHit_hk, &StandardHitregBase_ClientCalculateHit);
+	}
+
+	void Enable() {
+		calculate_hit->Load();
+	};
+
+	void Disable() {
+		calculate_hit->Unload();
+	};
 }

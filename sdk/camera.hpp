@@ -21,11 +21,9 @@ public:
 		return Function<Camera_get_fieldOfView_t>("UnityEngine.CoreModule", "UnityEngine", "Camera", "get_fieldOfView", 0)(this);
 	}
 
-	Vector2 ToScreen(Vector3 pos) {
+	Vector3 ToScreen(Vector3 pos) {
 		typedef Vector3(*Camera_WorldToScreenPoint_t)(Camera* this_, Vector3 pos);
-		auto screen_pos = Function<Camera_WorldToScreenPoint_t>("UnityEngine.CoreModule", "UnityEngine", "Camera", "WorldToScreenPoint", 1)(this, pos);
-
-		return Vector2(screen_pos.x, screen_pos.y);
+		return Function<Camera_WorldToScreenPoint_t>("UnityEngine.CoreModule", "UnityEngine", "Camera", "WorldToScreenPoint", 1)(this, pos);
 	}
 
 	Transform* GetTransform() {
