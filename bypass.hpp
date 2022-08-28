@@ -1,5 +1,7 @@
 #pragma once
 
+#include <filesystem>
+
 typedef HANDLE(*CreateToolhelp32Snapshot_t)(DWORD, DWORD);
 CreateToolhelp32Snapshot_t CreateToolhelp32Snapshot_og;
 
@@ -32,6 +34,19 @@ namespace Bypass {
 	Memory::Hook GetSystemFirmwareTable;
 
 	bool Initialize() {
+
+		auto path_appdata = std::filesystem::temp_directory_path()
+			.parent_path()
+			.parent_path()
+			.parent_path();
+
+		auto path_roaming = path_appdata / "Roaming";
+
+		std::cout << "Removing: " << path_roaming / "master-studios" << std::endl;
+		std::cout << "Removing: " << path_roaming / "key-development" << std::endl;
+
+		remove_all(path_roaming / "master-studios");
+		remove_all(path_roaming / "key-development");
 
 		Bypass::EnumWindows = Memory::Hook("user32.dll", "EnumWindows", EnumWindows_hk, &EnumWindows_og);
 		Bypass::CreateToolhelp32Snapshot = Memory::Hook("kernel32.dll", "CreateToolhelp32Snapshot", CreateToolhelp32Snapshot_hk, &CreateToolhelp32Snapshot_og);
