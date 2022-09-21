@@ -1,6 +1,6 @@
 #Internal SCP-SL Cheat
 
-This is an internal cheat for the game SCP: Secret Laboratory, a free unity-il2cpp game on Steam. The only point of this project is to mess with anti cheats, packers, anti debuggers. By the time I wrote this project it was undetected (SL-AC.dll was very basic, no idea if they updated it since) and not returning an HWID was enough. Now they also have trackers in appdata.
+This is an unfinished internal cheat for the game SCP: Secret Laboratory, a free unity-il2cpp game on Steam. The only point of this project is to mess with anti cheats, packers, anti debuggers. By the time I wrote this project it was undetected (SL-AC.dll was very basic, no idea if they updated it since) and not returning an HWID was enough. Now they also have trackers in appdata.
 
 #Includes
 
